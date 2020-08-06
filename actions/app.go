@@ -1,15 +1,15 @@
 package actions
 
 import (
+	"applying-tdd-with-buffalo/tasks_management/models"
+
 	"github.com/gobuffalo/buffalo"
+	"github.com/gobuffalo/buffalo-pop/v2/pop/popmw"
 	"github.com/gobuffalo/envy"
 	forcessl "github.com/gobuffalo/mw-forcessl"
 	paramlogger "github.com/gobuffalo/mw-paramlogger"
 	"github.com/unrolled/secure"
 
-	"applying-tdd-with-buffalo/tasks_management/models"
-
-	"github.com/gobuffalo/buffalo-pop/pop/popmw"
 	contenttype "github.com/gobuffalo/mw-contenttype"
 	"github.com/gobuffalo/x/sessions"
 	"github.com/rs/cors"
@@ -58,7 +58,9 @@ func App() *buffalo.App {
 		// Remove to disable this.
 		app.Use(popmw.Transaction(models.DB))
 
-		app.GET("/", HomeHandler)
+		//app.GET("/", HomeHandler)
+		tasksResource := TasksResource{}
+		app.GET("/tasks", tasksResource.Create)
 	}
 
 	return app
