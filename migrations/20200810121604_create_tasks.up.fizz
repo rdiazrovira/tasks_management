@@ -1,0 +1,9 @@
+create_table("tasks") {
+	t.Column("id", "uuid", {primary: true})
+	t.Column("description", "string", {"default": ""})
+	t.Column("status", "string", {"default": ""})
+	t.Column("completion_date", "timestamp", {})
+	t.Column("requester", "string", {"default": ""})
+	t.Column("executor", "string", {"default": ""})
+	t.Timestamps()
+}

@@ -9,7 +9,7 @@ import (
 
 	"applying-tdd-with-buffalo/tasks_management/models"
 
-	"github.com/gobuffalo/buffalo-pop/pop/popmw"
+	"github.com/gobuffalo/buffalo-pop/v2/pop/popmw"
 	contenttype "github.com/gobuffalo/mw-contenttype"
 	"github.com/gobuffalo/x/sessions"
 	"github.com/rs/cors"
@@ -59,6 +59,9 @@ func App() *buffalo.App {
 		app.Use(popmw.Transaction(models.DB))
 
 		app.GET("/", HomeHandler)
+
+		tasksResource := TasksResource{}
+		app.POST("/task", tasksResource.Create)
 	}
 
 	return app
