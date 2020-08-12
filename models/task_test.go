@@ -114,3 +114,98 @@ func (ms *ModelSuite) Test_Task_Create() {
 	ms.Equal(task.Requester, savedTask.Requester)
 	ms.Equal(task.Executor, savedTask.Executor)
 }
+
+func (ms *ModelSuite) Test_Task_List_Unmarshal() {
+	timeStr := "2020-08-10T08:27:00.000Z"
+
+	tcases := []struct {
+		tJSON      string
+		tasksCount int
+		hasErrors  bool
+	}{
+		{
+			`testing...`,
+			0,
+			true,
+		},
+		{
+			`[
+				{
+				"description": "Make a table with 4 chairs",
+				"status": "Done",
+				"completion_date": "` + timeStr + `",
+				"requester": "James Bond",
+				"executor": "John Smith"
+				}
+			]`,
+			1,
+			false,
+		},
+		{
+			`[
+				{
+					"description": "Make a table with 4 chairs",
+					"status": "Done",
+					"completion_date": "` + timeStr + `",
+					"requester": "James Bond",
+					"executor": "John Smith"
+				},
+				{
+					"description": "Close the door",
+					"status": "Done",
+					"completion_date": "` + timeStr + `",
+					"requester": "James Bond",
+					"executor": "John Smith"
+				}
+			]`,
+			2,
+			false,
+		},
+	}
+
+	for tIndex, tcase := range tcases {
+		tasks := Tasks{}
+		err := json.Unmarshal([]byte(tcase.tJSON), &tasks)
+
+		if tcase.hasErrors {
+			ms.Error(err, fmt.Sprintf("index: %v", tIndex))
+			continue
+		}
+
+		ms.NoError(err, fmt.Sprintf("index: %v", tIndex))
+		ms.Len(tasks, tcase.tasksCount)
+	}
+}
+
+func (ms *ModelSuite) Test_Task_List() {
+	task := Task{
+		Description:    "Make a table with 4 chairs",
+		Status:         "Done",
+		CompletionDate: time.Now(),
+		Requester:      "James Bond",
+		Executor:       "John Smith",
+	}
+	ms.NoError(ms.DB.Create(&task))
+
+	count, err := ms.DB.Count(Tasks{})
+	ms.NoError(err)
+	ms.Equal(1, count)
+
+	task = Task{
+		Description:    "Close the door",
+		Status:         "Done",
+		CompletionDate: time.Now(),
+		Requester:      "James Bond",
+		Executor:       "John Smith",
+	}
+	ms.NoError(ms.DB.Create(&task))
+
+	count, err = ms.DB.Count(Tasks{})
+	ms.NoError(err)
+	ms.Equal(2, count)
+
+	tasks := Tasks{}
+	ms.NoError(ms.DB.All(&tasks))
+	ms.Equal("Make a table with 4 chairs", tasks[0].Description)
+	ms.Equal("Close the door", tasks[1].Description)
+}

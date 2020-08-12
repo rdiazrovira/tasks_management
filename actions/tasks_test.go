@@ -45,3 +45,38 @@ func (as *ActionSuite) Test_TasksResource_Create() {
 	as.NoError(as.DB.All(&tasks))
 	as.Len(tasks, 6)
 }
+
+func (as *ActionSuite) Test_TasksResource_List() {
+	tasks := models.Tasks{
+		{
+			Description:    "Make a table with 4 chairs",
+			Status:         "Done",
+			CompletionDate: time.Now(),
+			Requester:      "John Smith",
+			Executor:       "James Bond",
+		},
+		{
+			Description:    "Close the door",
+			Status:         "Done",
+			CompletionDate: time.Now(),
+			Requester:      "John Smith",
+			Executor:       "James Bond",
+		},
+	}
+	as.NoError(as.DB.Create(&tasks))
+
+	res := as.JSON("/tasks").Get()
+	as.Equal(http.StatusOK, res.Code)
+
+	response := models.Tasks{}
+	as.NoError(json.Unmarshal(res.Body.Bytes(), &response))
+	as.Len(response, 2)
+
+	for rIndex := range response {
+		as.Equal(tasks[rIndex].Description, response[rIndex].Description, fmt.Sprintf("index: %v", rIndex))
+		as.Equal(tasks[rIndex].Status, response[rIndex].Status, fmt.Sprintf("index: %v", rIndex))
+		as.Equal(tasks[rIndex].CompletionDate.Format("2006-01-02"), response[rIndex].CompletionDate.Format("2006-01-02"), fmt.Sprintf("index: %v", rIndex))
+		as.Equal(tasks[rIndex].Requester, response[rIndex].Requester, fmt.Sprintf("index: %v", rIndex))
+		as.Equal(tasks[rIndex].Executor, response[rIndex].Executor, fmt.Sprintf("index: %v", rIndex))
+	}
+}

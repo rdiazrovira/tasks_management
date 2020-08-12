@@ -62,6 +62,7 @@ func App() *buffalo.App {
 
 		tasksResource := TasksResource{}
 		app.POST("/task", tasksResource.Create)
+		app.GET("/tasks", tasksResource.List)
 	}
 
 	return app
