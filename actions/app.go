@@ -58,11 +58,11 @@ func App() *buffalo.App {
 		// Remove to disable this.
 		app.Use(popmw.Transaction(models.DB))
 
-		app.GET("/", HomeHandler)
-
 		tasksResource := TasksResource{}
-		app.POST("/task", tasksResource.Create)
+		app.POST("/tasks", tasksResource.Create)
 		app.GET("/tasks", tasksResource.List)
+		app.GET("/tasks/pending", tasksResource.PendingList)
+		app.GET("/tasks/done", tasksResource.DoneTaskList)
 	}
 
 	return app

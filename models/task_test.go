@@ -81,10 +81,12 @@ func (ms *ModelSuite) Test_Task_Unmarshal() {
 	for tIndex, tcase := range tcases {
 		task := Task{}
 		err = json.Unmarshal([]byte(tcase.tJSON), &task)
+
 		if tcase.hasErrors {
 			ms.Error(err, fmt.Sprintf("index: %v", tIndex))
 			continue
 		}
+
 		ms.NoError(err, fmt.Sprintf("index: %v", tIndex))
 		ms.Equal(task.Description, tcase.task.Description, fmt.Sprintf("index: %v", tIndex))
 		ms.Equal(task.Status, tcase.task.Status, fmt.Sprintf("index: %v", tIndex))
@@ -92,27 +94,6 @@ func (ms *ModelSuite) Test_Task_Unmarshal() {
 		ms.Equal(task.Requester, tcase.task.Requester, fmt.Sprintf("index: %v", tIndex))
 		ms.Equal(task.Executor, tcase.task.Executor, fmt.Sprintf("index: %v", tIndex))
 	}
-}
-
-func (ms *ModelSuite) Test_Task_Create() {
-
-	task := Task{
-		Description:    "Make a table with 4 chairs",
-		Status:         "Done",
-		CompletionDate: time.Now(),
-		Requester:      "John Smith",
-		Executor:       "James Bond",
-	}
-	ms.NoError(ms.DB.Create(&task))
-
-	savedTask := Task{}
-	ms.NoError(ms.DB.First(&savedTask))
-
-	ms.Equal(task.Description, savedTask.Description)
-	ms.Equal(task.Status, savedTask.Status)
-	ms.Equal(task.CompletionDate.Format("2006-01-02"), savedTask.CompletionDate.Format("2006-01-02"))
-	ms.Equal(task.Requester, savedTask.Requester)
-	ms.Equal(task.Executor, savedTask.Executor)
 }
 
 func (ms *ModelSuite) Test_Task_List_Unmarshal() {
@@ -164,7 +145,7 @@ func (ms *ModelSuite) Test_Task_List_Unmarshal() {
 	}
 
 	for tIndex, tcase := range tcases {
-		tasks := Tasks{}
+		tasks := []Task{}
 		err := json.Unmarshal([]byte(tcase.tJSON), &tasks)
 
 		if tcase.hasErrors {
@@ -175,37 +156,4 @@ func (ms *ModelSuite) Test_Task_List_Unmarshal() {
 		ms.NoError(err, fmt.Sprintf("index: %v", tIndex))
 		ms.Len(tasks, tcase.tasksCount)
 	}
-}
-
-func (ms *ModelSuite) Test_Task_List() {
-	task := Task{
-		Description:    "Make a table with 4 chairs",
-		Status:         "Done",
-		CompletionDate: time.Now(),
-		Requester:      "James Bond",
-		Executor:       "John Smith",
-	}
-	ms.NoError(ms.DB.Create(&task))
-
-	count, err := ms.DB.Count(Tasks{})
-	ms.NoError(err)
-	ms.Equal(1, count)
-
-	task = Task{
-		Description:    "Close the door",
-		Status:         "Done",
-		CompletionDate: time.Now(),
-		Requester:      "James Bond",
-		Executor:       "John Smith",
-	}
-	ms.NoError(ms.DB.Create(&task))
-
-	count, err = ms.DB.Count(Tasks{})
-	ms.NoError(err)
-	ms.Equal(2, count)
-
-	tasks := Tasks{}
-	ms.NoError(ms.DB.All(&tasks))
-	ms.Equal("Make a table with 4 chairs", tasks[0].Description)
-	ms.Equal("Close the door", tasks[1].Description)
 }

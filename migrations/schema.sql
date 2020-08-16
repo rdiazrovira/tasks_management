@@ -32,32 +32,6 @@ CREATE TABLE public.schema_migration (
 ALTER TABLE public.schema_migration OWNER TO postgres;
 
 --
--- Name: tasks; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.tasks (
-    id uuid NOT NULL,
-    description character varying(255) DEFAULT ''::character varying NOT NULL,
-    status character varying(255) DEFAULT ''::character varying NOT NULL,
-    completion_date timestamp without time zone NOT NULL,
-    requester character varying(255) DEFAULT ''::character varying NOT NULL,
-    executor character varying(255) DEFAULT ''::character varying NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
-ALTER TABLE public.tasks OWNER TO postgres;
-
---
--- Name: tasks tasks_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.tasks
-    ADD CONSTRAINT tasks_pkey PRIMARY KEY (id);
-
-
---
 -- Name: schema_migration_version_idx; Type: INDEX; Schema: public; Owner: postgres
 --
 
